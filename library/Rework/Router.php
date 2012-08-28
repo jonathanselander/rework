@@ -77,6 +77,16 @@ class Rework_Router
     }
     
     /**
+     * Route table getter
+     * 
+     * @return array
+     */
+    public function getRoutes()
+    {
+        return $this->_routes;
+    }
+    
+    /**
      * Make sure routes are stored in the right order
      * 
      * @return \Rework_Router 

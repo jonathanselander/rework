@@ -27,8 +27,8 @@ class IndexController extends Rework_Controller
      * 
      * @route /
      */
-    public function getIndex($id)
+    public function getIndex()
     {
-        echo 'Example!';        
+        echo 'Example!';
     }
 }
