@@ -1,12 +1,37 @@
 <?php
-
+/**
+ * Class for building the routing table used for dispatching controller
+ * actions correctly
+ * 
+ * @author jonathan@madepeople.se 
+ */
 class Rework_Router
 {
-    private $_routeOriginals;
-    private $_routeProvides;
-    private $_routes;
+    /**
+     * Standard, automagically constructed routes
+     * @var array
+     */
+    private $_routeOriginals = array();
     
-    public function addRoute($controller)
+    /**
+     * Overridden routes on action level
+     * @var array
+     */
+    private $_routeProvides = array();
+    
+    /**
+     * Final routing table
+     * @var array
+     */
+    private $_routes = array();
+    
+    /**
+     * Reflect controllers and their actions and build the routes
+     * 
+     * @param Rework_Controller $controller
+     * @return \Rework_Router 
+     */
+    public function addRoute(Rework_Controller $controller)
     {
         $reflector = new Rework_Reflection;
         $controllerData = $reflector->reflect($controller);
@@ -47,10 +72,15 @@ class Rework_Router
 
         // Make sure the route order is correct
         $this->aggregateRoutes();
-        var_dump($this->_routes);
+        
         return $this;
     }
     
+    /**
+     * Make sure routes are stored in the right order
+     * 
+     * @return \Rework_Router 
+     */
     public function aggregateRoutes()
     {
         $this->_routes = array_replace($this->_routeOriginals,
@@ -66,7 +96,7 @@ class Rework_Router
      */
     public function match($uri)
     {
-        // TODO: Loop through all found routes and match against current request
+        // TODO: Handle parameters
         return isset($this->_routes[$uri])
                 ? $this->_routes[$uri]
                 : false;

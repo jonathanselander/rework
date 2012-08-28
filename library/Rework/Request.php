@@ -1,6 +1,8 @@
 <?php
 /**
  * Parse request parameters and validate against type classes if set 
+ * 
+ * @author jonathan@madepeople.se
  */
 class Rework_Request
 {
@@ -9,6 +11,11 @@ class Rework_Request
     const REQUEST_PUT = 'put';
     const REQUEST_DELETE = 'delete';
     
+    /**
+     * Return table of valid request methods
+     * 
+     * @return array
+     */
     public static function getRequestMethods()
     {
         return array(

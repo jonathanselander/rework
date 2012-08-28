@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Example IndexController skeleton, annotations can be used on the controllers
+ * themselves, to encapsulate all actions
+ * 
+ * @author jonathan@madepeople.se
+ * 
+ * @before AppHelper::displayRoutes
+ */
 class IndexController extends Rework_Controller
 {
     /**
@@ -20,8 +27,8 @@ class IndexController extends Rework_Controller
      * 
      * @route /
      */
-    public function getIndex()
+    public function getIndex($id)
     {
-        echo 'example!';        
+        echo 'Example!';        
     }
 }

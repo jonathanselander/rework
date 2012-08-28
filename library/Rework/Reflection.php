@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Use reflection to be able to create controller/action magic with 
+ * annotation style definitions within comments 
+ * 
+ * @author jonathan@madepeople.se
+ */
 class Rework_Reflection
 {
     const ANNOTATION_BEFORE = '@before';
@@ -7,14 +12,23 @@ class Rework_Reflection
     const ANNOTATION_ROUTE = '@route';
     const ANNOTATION_FORMAT = '@format';
     
+    /**
+     * Parse comment parameters of a controller class for annotation
+     * eg:
+     *  @before Helper::requireLogin
+     *  @format json
+     *  @route custom/route
+     * 
+     * @param Rework_Controller|string $class
+     * @return array
+     * @throws Exception 
+     */
     public function reflect($class)
     {
-        // TODO: reflect classes with comment parameters for annotation
-        // eg:
-        //  @before Helper::requireLogin
-        //  @format json
-        //  @route custom/route
-        $className = get_class($class);
+        $className = is_object($class)
+                ? get_class($class)
+                : $class;
+        
         $reflectionData = array();
         $ref = new ReflectionClass($className);
         foreach ($ref->getMethods() as $method) {

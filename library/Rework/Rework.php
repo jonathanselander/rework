@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Main bootstrapper class
+ * 
+ * @author jonathan@madepeople.se 
+ */
 class Rework
 {
     private static $_router;

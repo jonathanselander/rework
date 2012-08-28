@@ -1,9 +1,22 @@
 <?php
-
+/**
+ * Basic autoloader that loads all controller files for convenience
+ * 
+ * @author jonathan@madepeople.se 
+ */
 class Rework_Loader
 {
+    /**
+     * Holds the project basedir
+     * @var string
+     */
     private $_baseDir;
     
+    /**
+     * Require and set up routes for all controllers
+     * 
+     * @return \Rework_Loader
+     */
     private function _loadControllers()
     {
         $controllerDir = $this->_baseDir . '/app/controllers/';
@@ -13,8 +26,16 @@ class Rework_Loader
             $controllerObject = new $controllerName;
             Rework::route($controllerObject);
         }
+        
+        return $this;
     }
     
+    /**
+     * Initialize autoloader
+     * 
+     * @param string $baseDir
+     * @return \Rework_Loader 
+     */
     public function initialize($baseDir = './')
     {
         spl_autoload_register('Rework_Loader::load');
@@ -24,8 +45,15 @@ class Rework_Loader
         
         $this->_baseDir = $baseDir;
         $this->_loadControllers();
+        
+        return $this;
     }
     
+    /**
+     * Simple autoloader method
+     * 
+     * @param string $name
+     */
     public static function load($name)
     {
         $name = str_replace('_', '/', $name) . '.php';
