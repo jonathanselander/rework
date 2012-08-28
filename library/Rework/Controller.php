@@ -49,7 +49,6 @@ class Rework_Controller
 {
     /**
      * When set, overrides the view default
-     * 
      * @var string
      */
     private $_renderMethod;

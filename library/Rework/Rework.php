@@ -6,9 +6,28 @@
  */
 class Rework
 {
+    /**
+     * Current router
+     * @var \Rework_Router
+     */
     private static $_router;
+    
+    /**
+     * Current autoloader
+     * @var \Rework_Loader
+     */
     private static $_loader;
+    
+    /**
+     * Current request
+     * @var \Rework_Loader
+     */
     private static $_request;
+    
+    /**
+     * Current response
+     * @var \Rework_Response
+     */
     private static $_response;
     
     /** 
@@ -57,11 +76,9 @@ class Rework
     }
     
     /**
-     * Bootstrapper function
-     * 
-     * @param array|null $config 
+     * Simple bootstrapper
      */
-    public static function run($config = null)
+    public static function run()
     {
         require_once 'Rework/Loader.php';
         self::$_loader = new Rework_Loader;
@@ -80,7 +97,7 @@ class Rework
     {
         $router = self::getRouter();
         $request = self::getRequest();
-        $match = $router->match($request->getUri());
+        $match = $router->match($request);
         if ($match !== false) {
             $controller = $match['controller'];
             $action = $match['action'];

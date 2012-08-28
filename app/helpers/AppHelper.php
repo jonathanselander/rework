@@ -12,8 +12,8 @@ class AppHelper
         die('Access denied!');
     }
     
-    public static function displayRoutes()
+    public static function addRouteInfo($controller)
     {
-        
+        $controller->routes = print_r(Rework::getRouter()->getRoutes(), true);
     }
 }

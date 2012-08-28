@@ -8,7 +8,6 @@ class Rework_Response
 {
     /**
      * HTTP status code map
-     * 
      * @var array
      */
     private $_statusCodeMessages = array(
@@ -57,7 +56,6 @@ class Rework_Response
     
     /**
      * Holds the body of the reponse
-     * 
      * @var string
      */
     private $_body;

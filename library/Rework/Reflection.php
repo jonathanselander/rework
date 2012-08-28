@@ -41,7 +41,6 @@ class Rework_Reflection
             $lines = $this->_parseComment($method->getDocComment());
             
             $methodName = $method->getName();
-            
             $methodData = $this->_fetchAnnotationData($lines);
             $data = array_merge_recursive($classData, $methodData);
             $reflectionData[$methodName] = $data;

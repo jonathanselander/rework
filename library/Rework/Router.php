@@ -42,9 +42,9 @@ class Rework_Router
         $requestMethods = Rework_Request::getRequestMethods();
         foreach ($controllerData as $action => $settings) {
             $routedAction = '';
-            foreach ($requestMethods as $method) {
-                if (preg_match("/^{$method}[A-Z][a-z]+$/", $action)) {
-                    $routedAction = preg_replace("/^$method/", '', $action);
+            foreach ($requestMethods as $requestMethod) {
+                if (preg_match("/^{$requestMethod}[A-Z][a-z]+$/", $action)) {
+                    $routedAction = preg_replace("/^$requestMethod/", '', $action);
                     break;
                 }
             }
@@ -59,6 +59,7 @@ class Rework_Router
             // Let's hope PHP uses the same object for all actions
             $settings['controller'] = $controller;
             $settings['action'] = $action;
+            $settings['requestMethod'] = $requestMethod;
 
             $route = '/' . $baseName . '/' . $routedAction;
             if (!empty($settings[Rework_Reflection::ANNOTATION_ROUTE])) {
@@ -104,11 +105,23 @@ class Rework_Router
      * 
      * @param string $uri
      */
-    public function match($uri)
+    public function match(Rework_Request $request)
     {
-        // TODO: Handle parameters
-        return isset($this->_routes[$uri])
-                ? $this->_routes[$uri]
-                : false;
+        $uri = $request->getUri();
+        
+        // First, match the URI itself
+        if (!isset($this->_routes[$uri])) {
+            return false;
+        }
+        
+        // Second, the request method
+        $match = $this->_routes[$uri];
+        if ($match['requestMethod'] !== strtolower($request->getMethod())) {
+            return false;
+        }
+        
+        // TODO: Third, match eventual parameters
+        
+        return $match;
     }
 }

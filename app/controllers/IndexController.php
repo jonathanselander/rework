@@ -5,7 +5,7 @@
  * 
  * @author jonathan@madepeople.se
  * 
- * @before AppHelper::displayRoutes
+ * @before AppHelper::addRouteInfo
  */
 class IndexController extends Rework_Controller
 {
@@ -29,7 +29,7 @@ class IndexController extends Rework_Controller
      */
     public function getIndex()
     {
-        $this->name = 'Kurt';
+        $this->name = 'John Smith';
         $this->ok('index/index');
     }
 }
