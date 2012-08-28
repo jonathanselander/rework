@@ -18,7 +18,7 @@ class IndexController extends Rework_Controller
      * Receive GET
      * Alias /index/index to /
      * 
-     * @provides /
+     * @route /
      */
     public function getIndex()
     {

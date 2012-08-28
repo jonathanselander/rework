@@ -4,7 +4,7 @@ class Rework_Reflection
 {
     const ANNOTATION_BEFORE = '@before';
     const ANNOTATION_AFTER = '@after';
-    const ANNOTATION_PROVIDES = '@provides';
+    const ANNOTATION_ROUTE = '@route';
     const ANNOTATION_FORMAT = '@format';
     
     public function reflect($class)
@@ -13,7 +13,7 @@ class Rework_Reflection
         // eg:
         //  @before Helper::requireLogin
         //  @format json
-        //  @provides custom/route
+        //  @route custom/route
         $className = get_class($class);
         $reflectionData = array();
         $ref = new ReflectionClass($className);
@@ -45,13 +45,19 @@ class Rework_Reflection
 
                 switch ($parts[0]) {
                     case self::ANNOTATION_BEFORE:
-                        $methodData[self::ANNOTATION_BEFORE] = $parts[1];
+                        if (empty($methodData[self::ANNOTATION_BEFORE])) {
+                            $methodData[self::ANNOTATION_BEFORE] = array();
+                        }
+                        $methodData[self::ANNOTATION_BEFORE][] = $parts[1];
                         break;
                     case self::ANNOTATION_AFTER:
-                        $methodData[self::ANNOTATION_AFTER] = $parts[1];
+                        if (empty($methodData[self::ANNOTATION_AFTER])) {
+                            $methodData[self::ANNOTATION_AFTER] = array();
+                        }
+                        $methodData[self::ANNOTATION_AFTER][] = $parts[1];
                         break;
-                    case self::ANNOTATION_PROVIDES:
-                        $methodData[self::ANNOTATION_PROVIDES] = $parts[1];
+                    case self::ANNOTATION_ROUTE:
+                        $methodData[self::ANNOTATION_ROUTE] = $parts[1];
                         break;
                     case self::ANNOTATION_FORMAT:
                         $methodData[self::ANNOTATION_FORMAT] = $parts[1];

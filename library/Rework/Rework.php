@@ -36,16 +36,18 @@ class Rework
             $controller = $match['controller'];
             $action = $match['action'];
 
-            if (isset($match[Rework_Reflection::ANNOTATION_BEFORE])) {
-                call_user_func($match[Rework_Reflection::ANNOTATION_BEFORE],
-                        $controller);
+            if (!empty($match[Rework_Reflection::ANNOTATION_BEFORE])) {
+                foreach ($match[Rework_Reflection::ANNOTATION_BEFORE] as $function) {
+                    call_user_func($function, $controller);
+                }
             }
             
             $controller->$action();
 
-            if (isset($match[Rework_Reflection::ANNOTATION_AFTER])) {
-                call_user_func($match[Rework_Reflection::ANNOTATION_AFTER],
-                        $controller);
+            if (!empty($match[Rework_Reflection::ANNOTATION_AFTER])) {
+                foreach ($match[Rework_Reflection::ANNOTATION_AFTER] as $function) {
+                    call_user_func($function, $controller);
+                }
             }
             
         } else {

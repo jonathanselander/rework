@@ -11,7 +11,6 @@ class Rework_Router
         $reflector = new Rework_Reflection;
         $controllerData = $reflector->reflect($controller);
 
-        // TODO: implement queue system for route adding
         $baseName = strtolower(preg_replace('/Controller$/', '',
                 get_class($controller)));
 
@@ -37,16 +36,16 @@ class Rework_Router
             $settings['action'] = $action;
 
             $route = '/' . $baseName . '/' . $routedAction;
-            if (!empty($settings[Rework_Reflection::ANNOTATION_PROVIDES])) {
+            if (!empty($settings[Rework_Reflection::ANNOTATION_ROUTE])) {
                 $settings['_originalRoute'] = $route;
-                $route = $settings[Rework_Reflection::ANNOTATION_PROVIDES];
+                $route = $settings[Rework_Reflection::ANNOTATION_ROUTE];
                 $this->_routeProvides[$route] = $settings;
             } else {
                 $this->_routeOriginals[$route] = $settings;
             }
         }
 
-        // Make sure route order is correct
+        // Make sure the route order is correct
         $this->aggregateRoutes();
         var_dump($this->_routes);
         return $this;
