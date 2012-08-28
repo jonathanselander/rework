@@ -10,7 +10,7 @@ class Rework_Reflection
     const ANNOTATION_BEFORE = '@before';
     const ANNOTATION_AFTER = '@after';
     const ANNOTATION_ROUTE = '@route';
-    const ANNOTATION_FORMAT = '@format';
+    const ANNOTATION_RENDER = '@render';
     
     /**
      * Parse comment parameters of a controller class for annotation
@@ -125,8 +125,8 @@ class Rework_Reflection
                 case self::ANNOTATION_ROUTE:
                     $data[self::ANNOTATION_ROUTE] = $parts[1];
                     break;
-                case self::ANNOTATION_FORMAT:
-                    $data[self::ANNOTATION_FORMAT] = $parts[1];
+                case self::ANNOTATION_RENDER:
+                    $data[self::ANNOTATION_RENDER] = $parts[1];
                     break;
             }
         }

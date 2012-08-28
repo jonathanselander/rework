@@ -8,7 +8,14 @@ class Rework
 {
     private static $_router;
     private static $_loader;
+    private static $_request;
+    private static $_response;
     
+    /** 
+     * Current router getter
+     * 
+     * @return \Rework_Router
+     */
     public static function getRouter()
     {
         if (is_null(self::$_router)) {
@@ -18,24 +25,62 @@ class Rework
         return self::$_router;
     }
     
+    /**
+     * Getter for current request
+     * 
+     * @return \Rework_Request
+     */
+    public static function getRequest()
+    {
+        return self::$_request;
+    }
+    
+    /**
+     * Getter for current response
+     * 
+     * @return \Rework_Response
+     */
+    public static function getResponse()
+    {
+        return self::$_response;
+    }
+    
+    /**
+     * Add controller route
+     * 
+     * @param Rework_Controller $controller 
+     */
     public static function route(Rework_Controller $controller)
     {
         $router = self::getRouter();
         $router->addRoute($controller);
     }
     
+    /**
+     * Bootstrapper function
+     * 
+     * @param array|null $config 
+     */
     public static function run($config = null)
     {
         require_once 'Rework/Loader.php';
         self::$_loader = new Rework_Loader;
         self::$_loader->initialize();
+        self::$_request = new Rework_Request;
+        self::$_response = new Rework_Response;
         self::dispatch();
     }
     
+    /**
+     * Main dispatch function
+     * 
+     * @throws Exception 
+     */
     public static function dispatch()
     {
         $router = self::getRouter();
-        $match = $router->match($_SERVER['REQUEST_URI']); 
+        $request = self::getRequest();
+        $match = $router->match($request->getUri());
         if ($match !== false) {
             $controller = $match['controller'];
             $action = $match['action'];
@@ -46,14 +91,18 @@ class Rework
                 }
             }
             
-            $controller->$action();
+            if (isset($match[Rework_Reflection::ANNOTATION_RENDER])) {
+                $controller->setRenderMethod($match[Rework_Reflection::ANNOTATION_RENDER]);
+            }
+            
+            call_user_func_array(array($controller, $action), 
+                    $request->getParams());
 
             if (!empty($match[Rework_Reflection::ANNOTATION_AFTER])) {
                 foreach ($match[Rework_Reflection::ANNOTATION_AFTER] as $function) {
                     call_user_func($function, $controller);
                 }
             }
-            
         } else {
             throw new Exception('404');
         }

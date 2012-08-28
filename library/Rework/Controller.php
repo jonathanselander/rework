@@ -48,25 +48,108 @@
 class Rework_Controller
 {
     /**
-     * One magic __call per request is all right
+     * When set, overrides the view default
+     * 
+     * @var string
+     */
+    private $_renderMethod;
+    
+    /**
+     * Use magic to handle custom response codes
      * 
      * @param string $name
      * @param array $arguments
      * @throws \BadMethodCallException
      */
-    public function __call($name, $arguments)
+    public final function __call($name, $arguments)
     {
-        // TODO: handle _XXX for response codes, eg:
-        //  $this->_200("wassup");
-        
         // TODO: handle argument as body for response
         
         if (preg_match('/^_\d{3}$/', $name)) {
             $responseCode = str_replace('_', '', $name);
-            http_response_code($responseCode);
+            $this->_renderAndRespond($arguments[0], $arguments[1],
+                    $responseCode);
             return;
         }
 
         throw new BadMethodCallException("The method '$name' does not exist");
+    }
+    
+    /**
+     * Render the view as phtml, plaintext or json, set the response code
+     * and respond
+     * 
+     * @param string $argument
+     * @param string $format 
+     * @param int $responseCode
+     */
+    protected final function _renderAndRespond($argument,
+            $method = null,
+            $responseCode = 200)
+    {
+        if ($method === null) {
+            // If the method is null we check if it's been set using
+            // an annotation
+            $method = $this->getRenderMethod();
+        }
+        
+        $view = new Rework_View;
+        $body = $view->render($argument, get_object_vars($this), $method);
+        $response = Rework::getResponse();
+        $response->setResponseCode($responseCode)
+                ->setBody($body)
+                ->send();
+    }
+
+    /**
+     * Short-hand for 200
+     * 
+     * @param string $argument
+     */
+    protected final function ok($argument, $method = null)
+    {
+        $this->_200($argument, $method);
+    }
+    
+    /**
+     * Short-hand for 404
+     * 
+     * @param string $argument
+     */
+    protected final function notfound($argument, $method = null)
+    {
+        return $this->_404($argument, $method);
+    }
+    
+    /**
+     * Short-hand for 500
+     * 
+     * @param string $argument
+     */
+    protected final function error($argument, $method = null)
+    {
+        return $this->_500($argument, $method);
+    }
+    
+    /**
+     * Setter for the view render method
+     * 
+     * @param string $method
+     * @return \Rework_Controller 
+     */
+    public final function setRenderMethod($method)
+    {
+        $this->_renderMethod = $method;
+        return $this;
+    }
+    
+    /**
+     * Getter for the view render method
+     * 
+     * @return string
+     */
+    public final function getRenderMethod()
+    {
+        return $this->_renderMethod;
     }
 }

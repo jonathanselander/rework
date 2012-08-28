@@ -29,6 +29,7 @@ class IndexController extends Rework_Controller
      */
     public function getIndex()
     {
-        echo 'Example!';
+        $this->name = 'Kurt';
+        $this->ok('index/index');
     }
 }

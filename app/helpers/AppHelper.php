@@ -14,6 +14,6 @@ class AppHelper
     
     public static function displayRoutes()
     {
-        var_dump(Rework::getRouter()->getRoutes());
+        
     }
 }
