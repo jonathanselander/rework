@@ -125,8 +125,8 @@ class Rework_Router
                 break;
             }
             
-            if (count($settings['_parameters'])) {
-                // Route has parameters
+            if ($request->getMethod() === 'GET' && count($settings['_parameters'])) {
+                // Route has parameters, POST works differently
                 $expression = $this->_convertRouteToRegex($route);
                 preg_match_all($expression, $uri, $matches);
                 
