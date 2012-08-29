@@ -17,7 +17,7 @@ class Rework_Router
      * Overridden routes on action level
      * @var array
      */
-    private $_routeProvides = array();
+    private $_routeAliases = array();
     
     /**
      * Final routing table
@@ -61,11 +61,19 @@ class Rework_Router
             $settings['action'] = $action;
             $settings['requestMethod'] = $requestMethod;
 
-            $route = '/' . $baseName . '/' . $routedAction;
+            $parameterSuffix = '';
+            if (count($settings['_parameters'])) {
+                foreach ($settings['_parameters'] as $parameter) {
+                    $parameterSuffix .= '/:' . $parameter->name;
+                }
+            }
+            
+            $route = '/' . $baseName . '/' . $routedAction . $parameterSuffix;
             if (!empty($settings[Rework_Reflection::ANNOTATION_ROUTE])) {
                 $settings['_originalRoute'] = $route;
-                $route = $settings[Rework_Reflection::ANNOTATION_ROUTE];
-                $this->_routeProvides[$route] = $settings;
+                $route = $settings[Rework_Reflection::ANNOTATION_ROUTE]
+                        . $parameterSuffix;
+                $this->_routeAliases[$route] = $settings;
             } else {
                 $this->_routeOriginals[$route] = $settings;
             }
@@ -95,7 +103,7 @@ class Rework_Router
     public function aggregateRoutes()
     {
         $this->_routes = array_replace($this->_routeOriginals,
-                $this->_routeProvides);
+                $this->_routeAliases);
         
         return $this;
     }
@@ -110,18 +118,65 @@ class Rework_Router
         $uri = $request->getUri();
         
         // First, match the URI itself
-        if (!isset($this->_routes[$uri])) {
+        $match = null;
+        foreach ($this->_routes as $route => $settings) {
+            if ($uri === $route) {
+                $match = $settings;
+                break;
+            }
+            
+            if (count($settings['_parameters'])) {
+                // Route has parameters
+                $expression = $this->_convertRouteToRegex($route);
+                preg_match_all($expression, $uri, $matches);
+                
+                // We don't want the match-of-all
+                array_shift($matches);
+                if (empty($matches[0])) {
+                    // No match
+                    continue;
+                }
+                
+                $parameters = array();
+                foreach ($settings['_parameters'] as $key => $parameter) {
+                    $parameters[$parameter->name] = $matches[$key][0];
+                }
+                
+                $match = $settings;
+                $request->setParams($parameters);
+            }
+        }
+        
+        if ($match === null) {
             return false;
         }
         
         // Second, the request method
-        $match = $this->_routes[$uri];
         if ($match['requestMethod'] !== strtolower($request->getMethod())) {
             return false;
         }
         
-        // TODO: Third, match eventual parameters
-        
         return $match;
+    }
+    
+    /**
+     * Convert the defined route to a regular expression that can be used
+     * to match against the requested URI
+     * 
+     * @param string $route
+     * @return string 
+     */
+    private final function _convertRouteToRegex($route)
+    {
+        $patterns = array(
+            '#/:[a-zA-Z_]+#',
+        );
+        
+        $replacements = array(
+            '/([^/]+)',
+        );
+        
+        $expression = preg_replace($patterns, $replacements, $route);
+        return "#$expression#";
     }
 }

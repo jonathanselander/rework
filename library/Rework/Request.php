@@ -12,6 +12,12 @@ class Rework_Request
     const REQUEST_DELETE = 'delete';
     
     /**
+     * Holds the request parameters for the action
+     * @var array
+     */
+    private $_params;
+    
+    /**
      * Return table of valid request methods
      * 
      * @return array
@@ -46,8 +52,40 @@ class Rework_Request
         return $_SERVER['REQUEST_METHOD'];
     }
     
+    /**
+     * Get request parameters, with defaults depending on request method
+     * 
+     * @return array 
+     */
     public final function getParams()
     {
-        return $_REQUEST;
+        if (empty($this->_params)) {
+            switch ($this->getMethod()) {
+                case 'GET':
+                    return $_GET;
+                case 'POST':
+                    return $_POST;
+                default:
+                    return $_REQUEST;
+            }
+        }
+        return $this->_params;
+    }
+    
+    /**
+     * Set the request parameters to something custom
+     * 
+     * @param array $params
+     * @return \Rework_Request
+     * @throws Exception 
+     */
+    public final function setParams($params)
+    {
+        if (!is_array($params)) {
+            throw new Exception('Request parameters has to be an associative array');
+        }
+        
+        $this->_params = $params;
+        return $this;
     }
 }

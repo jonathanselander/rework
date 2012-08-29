@@ -32,4 +32,15 @@ class IndexController extends Rework_Controller
         $this->name = 'John Smith';
         $this->ok('index/index');
     }
+    
+    /**
+     * Example route with parameters
+     * 
+     * Access with /index/test/foo/bar
+     */
+    public function getTest($id, $name)
+    {
+        $this->ok('The passed ID is ' . $id . ', the name is ' . $name,
+                Rework_View::METHOD_PLAIN);
+    }
 }

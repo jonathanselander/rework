@@ -39,10 +39,10 @@ class Rework_Reflection
         // Then, reflect the methods
         foreach ($ref->getMethods() as $method) {
             $lines = $this->_parseComment($method->getDocComment());
-            
-            $methodName = $method->getName();
             $methodData = $this->_fetchAnnotationData($lines);
             $data = array_merge_recursive($classData, $methodData);
+            $data['_parameters'] = $method->getParameters();
+            $methodName = $method->getName();
             $reflectionData[$methodName] = $data;
         }
 
