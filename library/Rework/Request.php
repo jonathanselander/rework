@@ -18,6 +18,12 @@ class Rework_Request
     private $_params;
     
     /**
+     * Holds the URI for the current request
+     * @var string
+     */
+    private $_uri;
+    
+    /**
      * Return table of valid request methods
      * 
      * @return array
@@ -33,13 +39,28 @@ class Rework_Request
     }
     
     /**
-     * Return a stripped down URI
+     * Returns the request URI
      * 
      * @return string
      */
     public final function getUri()
     {
-        return $_SERVER['REQUEST_URI'];
+        if (empty($this->_uri)) {
+            $this->_uri = $_SERVER['REQUEST_URI'];
+        }
+        return $this->_uri;
+    }
+    
+    /**
+     * Setter for the URI
+     * 
+     * @param string $uri
+     * @return \Rework_Request 
+     */
+    public final function setUri($uri)
+    {
+        $this->_uri = $uri;
+        return $this;
     }
     
     /**

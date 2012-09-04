@@ -35,8 +35,16 @@ class Rework
      * @var array
      */
     private static $_config = array(
-        'layout' => 'default'
+        'layout' => 'default',
+        'notFoundRoute' => '/error/notfound',
+        'errorRoute' => '/error/index',
     );
+    
+    /**
+     * Keep track of if errors have already been dispatched
+     * @var boolean 
+     */
+    private static $_errorsAreDispatched = false;
     
     /** 
      * Current router getter
@@ -108,29 +116,44 @@ class Rework
         $request = self::getRequest();
         $match = $router->match($request);
         if ($match !== false) {
-            $controller = $match['controller'];
-            $action = $match['action'];
+            try {
+                $controller = $match['controller'];
+                $action = $match['action'];
 
-            if (!empty($match[Rework_Reflection::ANNOTATION_BEFORE])) {
-                foreach ($match[Rework_Reflection::ANNOTATION_BEFORE] as $function) {
-                    call_user_func($function, $controller);
+                if (!empty($match[Rework_Reflection::ANNOTATION_BEFORE])) {
+                    foreach ($match[Rework_Reflection::ANNOTATION_BEFORE] as $function) {
+                        call_user_func($function, $controller);
+                    }
                 }
-            }
-            
-            if (isset($match[Rework_Reflection::ANNOTATION_RENDER])) {
-                $controller->setRenderMethod($match[Rework_Reflection::ANNOTATION_RENDER]);
-            }
-            
-            call_user_func_array(array($controller, $action), 
-                    $request->getParams());
 
-            if (!empty($match[Rework_Reflection::ANNOTATION_AFTER])) {
-                foreach ($match[Rework_Reflection::ANNOTATION_AFTER] as $function) {
-                    call_user_func($function, $controller);
+                if (isset($match[Rework_Reflection::ANNOTATION_RENDER])) {
+                    $controller->setRenderMethod($match[Rework_Reflection::ANNOTATION_RENDER]);
                 }
+
+                call_user_func_array(array($controller, $action), 
+                        $request->getParams());
+
+                if (!empty($match[Rework_Reflection::ANNOTATION_AFTER])) {
+                    foreach ($match[Rework_Reflection::ANNOTATION_AFTER] as $function) {
+                        call_user_func($function, $controller);
+                    }
+                }
+            } catch (Exception $e) {
+                if (self::$_errorsAreDispatched === true) {
+                    // Prevent endless nesting
+                    echo '<br><br><em>An additional error was caught:</em><br>' .
+                            '<strong>' . get_class($e) . ': ' . $e->getMessage() . '</strong>';
+                    return;
+                }
+                
+                $request->setParams(array('exception' => $e))
+                        ->setUri(Rework::getConfig('errorRoute'));
+                
+                self::$_errorsAreDispatched = true;
+                self::dispatch();
             }
         } else {
-            throw new Exception('404');
+            throw new Exception('No route found and no 404 Controller specified');
         }
     }
     

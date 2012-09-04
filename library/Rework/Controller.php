@@ -89,7 +89,7 @@ class Rework_Controller
         if ($method === null) {
             // If the method is null we check if it's been set using
             // an annotation
-            $method = $this->getRenderMethod();
+            $method = $this->_renderMethod;
         }
         
         $view = new Rework_View;
@@ -143,12 +143,13 @@ class Rework_Controller
     }
     
     /**
-     * Getter for the view render method
+     * Getter for request parameters 
      * 
-     * @return string
+     * @return mixed
      */
-    public final function getRenderMethod()
+    public final function param($key)
     {
-        return $this->_renderMethod;
+        $params = Rework::getRequest()->getParams();
+        return isset($params[$key]) ? $params[$key] : null;
     }
 }

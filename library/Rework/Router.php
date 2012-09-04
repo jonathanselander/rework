@@ -43,7 +43,7 @@ class Rework_Router
         foreach ($controllerData as $action => $settings) {
             $routedAction = '';
             foreach ($requestMethods as $requestMethod) {
-                if (preg_match("/^{$requestMethod}[A-Z][a-z]+$/", $action)) {
+                if (preg_match("/^{$requestMethod}([A-Z][a-z]+)+$/", $action)) {
                     $routedAction = preg_replace("/^$requestMethod/", '', $action);
                     break;
                 }
@@ -117,7 +117,7 @@ class Rework_Router
     {
         $uri = $request->getUri();
         
-        // First, match the URI itself
+        // Walk through routes for possible matches
         $match = null;
         foreach ($this->_routes as $route => $settings) {
             if ($uri === $route) {
@@ -147,13 +147,16 @@ class Rework_Router
             }
         }
         
-        if ($match === null) {
-            return false;
-        }
-        
-        // Second, the request method
-        if ($match['requestMethod'] !== strtolower($request->getMethod())) {
-            return false;
+        if ($match === null
+                || $match['requestMethod'] !== strtolower($request->getMethod()))
+        {
+            // No match, see if there is a 404 route defined
+            $notFoundRoute = Rework::getConfig('notFoundRoute');
+            if (empty($notFoundRoute)
+                    || !isset($this->_routes[$notFoundRoute])) {
+                return false;
+            }
+            $match = $this->_routes[$notFoundRoute];
         }
         
         return $match;
