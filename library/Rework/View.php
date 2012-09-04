@@ -11,8 +11,6 @@ class Rework_View
     const METHOD_PLAIN = 'plain';
     const METHOD_JSON = 'json';
     
-    private $_content;
-
     /**
      * Render view using the given method
      * 
