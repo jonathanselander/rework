@@ -30,6 +30,14 @@ class Rework
      */
     private static $_response;
     
+    /**
+     * Configuration data with default values
+     * @var array
+     */
+    private static $_config = array(
+        'layout' => 'default'
+    );
+    
     /** 
      * Current router getter
      * 
@@ -78,9 +86,10 @@ class Rework
     /**
      * Simple bootstrapper
      */
-    public static function run()
+    public static function run($config = array())
     {
         require_once 'Rework/Loader.php';
+        self::setConfig($config);
         self::$_loader = new Rework_Loader;
         self::$_loader->initialize();
         self::$_request = new Rework_Request;
@@ -123,5 +132,42 @@ class Rework
         } else {
             throw new Exception('404');
         }
+    }
+    
+    /**
+     * Setter for configuration value
+     * 
+     * @param array|string $data
+     * @param mixed $value
+     * @return void
+     * @throws Exception 
+     */
+    public static function setConfig($data, $value = '')
+    {
+        if (is_array($data) && empty($value)) {
+            $config = array_merge(self::$_config, $data);
+            return;
+        } else if (!is_array($data) && !empty($value)) {
+            self::$_config[$data] = $value;
+            return;
+        }
+        
+        throw new Exception("Invalid configuration data");
+    }
+    
+    /**
+     * Return configuration value
+     * 
+     * @param string $key
+     * @return mixed
+     * @throws Exception 
+     */
+    public static function getConfig($key)
+    {
+        if (!isset(self::$_config[$key])) {
+            throw new Exception("Config key '$key' isn't set");
+        }
+        
+        return self::$_config[$key];
     }
 }
