@@ -36,10 +36,10 @@ class IndexController extends Rework_Controller
      * Example route with parameters
      * 
      * Access with /index/test/foo/bar
+     * @render plain
      */
     public function getTest($id, $name)
     {
-        $this->ok('The passed ID is ' . $id . ', the name is ' . $name,
-                Rework_View::METHOD_PLAIN);
+        $this->ok('The passed ID is ' . $id . ', the name is ' . $name);
     }
 }
